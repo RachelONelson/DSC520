@@ -1,0 +1,99 @@
+---
+title: "4.1 Assignment: Student Survey"
+author: "Rachel Nelson"
+date: "6/24/2020"
+output:
+  
+  word_document: default
+  pdf_document: default
+---
+
+## Assignment Overview
+1. Is there a significant relationship between the amount of time spent reading and the time spent watching?
+2. Are there other significant relationships that can be discovered? 
+
+###### Data Set Clarification
+* TimeReading is in hours
+* TimeTV is in minutes
+* Happiness is a unitless index
+* Gender 1 = male
+
+```{r setup, include=TRUE}
+survey_df <- read.csv("C:/Users/NelsonR/OneDrive - Weyerhaeuser/Desktop/Current Work/data/student-survey.csv")
+```
+
+### Use R to calculate the covariance of the Survey variables and provide an explanation of why you would use this calculation and what the results indicate.
+```{r}
+cov(survey_df)
+```
+
+The covariance of the survey results measures the directional relationship between two factors and using the cov() function allows me to check all of the factors against all of the other factors. 
+A positive covariance between two factors means that when one factor increases, the other factor increases.  A negative covariance between two factors means that when one factor increases, the other decreases.
+
+In this case, we can see that 
+1. TimeReading has negative covariance with TimeTV, Happiness and Gender
+2. TimeTV has a negative covariance with TimeReading, but positive covariance with Happiness and Gender
+3. Happiness has a negative covariance with TimeReading, but positive with TimeTV and Gender
+4. Gender has a negative covariance with TImeReading, but positive with Happiness and GEnder
+
+### Examine the Survey data variables. What measurement is being used for the variables? Explain what effect changing the measurement being used for the variables would have on the covariance calculation. Would this be a problem? Explain and provide a better alternative if needed.
+
+The variables in the survey data include TimeReading, TimeTV, Happiness and GEnder
+* TimeReading is in hours
+* TimeTV is in minutes
+* Happiness is a unitless index
+* Gender 1 = male
+
+
+
+### Choose the type of correlation test to perform, explain why you chose this test, and make a prediction if the test yields a positive or negative correlation?
+
+There are three types of correlation formulas. The most common method is Pearson's correlation, which uses the linear regression of two variables. This method is used with the data is normal.The second type of correlation is Spearman's, which computes the correlation between the rank of the two variables. Finally, there is the Kendall method which measures the correpondence between the ranking of the two variables. 
+
+
+
+
+
+### Perform a correlation analysis of:
+#### All variables
+```{r}
+cor(survey_df, method = "pearson")
+```
+
+#### A single correlation between two a pair of the variables
+```{r}
+cor(survey_df$TimeReading, survey_df$TimeTV, method = "pearson")
+```
+
+#### Repeat your correlation test in step 2 but set the confidence interval at 99%
+```{r}
+cor.test(survey_df$TimeReading, survey_df$TimeTV, alternative = "less", method = "pearson", conf.level = 0.99)
+```
+
+#### Describe what the calculations in the correlation matrix suggest about the relationship between the variables. Be specific with your explanation.
+```{r}
+
+```
+
+
+### Calculate the correlation coefficient and the coefficient of determination, describe what you conclude about the results.
+```{r}
+cor(survey_df)
+```
+
+
+### Based on your analysis can you say that watching more TV caused students to read less? Explain.
+
+### Pick three variables and perform a partial correlation, documenting which variable you are “controlling”. Explain how this changes your interpretation and explanation of the results.
+```{r}
+
+```
+
+
+## calculate the covariance of the Survey variables and provide an explanation of why you would use this calculation and what the results indicate
+```{r}
+
+```
+
+
+
