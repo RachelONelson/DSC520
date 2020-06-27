@@ -4,8 +4,8 @@ author: "Rachel Nelson"
 date: "6/24/2020"
 output:
   
-  word_document: default
   pdf_document: default
+  word_document: default
   html_document: default
 ---
 
@@ -116,6 +116,7 @@ There is a strong negative correlation between the time spent watching TV to the
 ```{r}
 #Grabbing the correlation between TimeReading and TimeTV
 cor(survey_df$TimeReading,survey_df$TimeTV)
+library(ppcor)
 #Partial correlation between TimeReading, TimeTV and Happiness
 pcor.test(survey_df$TimeReading,survey_df$TimeTV,survey_df$Happiness)
 
