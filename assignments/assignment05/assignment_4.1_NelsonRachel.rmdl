@@ -1,0 +1,134 @@
+---
+title: "4.1 Assignment: Student Survey"
+author: "Rachel Nelson"
+date: "6/24/2020"
+output:
+  
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+## Assignment Overview
+1. Is there a significant relationship between the amount of time spent reading and the time spent watching?
+2. Are there other significant relationships that can be discovered? 
+
+###### Data Set Clarification
+* TimeReading is in hours
+* TimeTV is in minutes
+* Happiness is a unitless index
+* Gender 1 = male
+
+```{r setup, include=TRUE}
+survey_df <- read.csv("data/student-survey.csv")
+```
+
+### Use R to calculate the covariance of the Survey variables and provide an explanation of why you would use this calculation and what the results indicate.
+```{r}
+cov(survey_df)
+```
+
+The covariance of the survey results measures the directional relationship between two factors and using the cov() function allows me to check all of the factors against all of the other factors. 
+A positive covariance between two factors means that when one factor increases, the other factor increases.  A negative covariance between two factors means that when one factor increases, the other decreases.
+
+In this case, we can see that 
+1. TimeReading has negative covariance with TimeTV, Happiness and Gender
+2. TimeTV has a negative covariance with TimeReading, but positive covariance with Happiness and Gender
+3. Happiness has a negative covariance with TimeReading, but positive with TimeTV and Gender
+4. Gender has a negative covariance with TImeReading, but positive with Happiness and GEnder
+
+### Examine the Survey data variables. What measurement is being used for the variables? Explain what effect changing the measurement being used for the variables would have on the covariance calculation. Would this be a problem? Explain and provide a better alternative if needed.
+
+The variables in the survey data include TimeReading, TimeTV, Happiness and GEnder
+* TimeReading is in hours
+* TimeTV is in minutes
+* Happiness is a unitless index
+* Gender 1 = male
+
+
+### Choose the type of correlation test to perform, explain why you chose this test, and make a prediction if the test yields a positive or negative correlation?
+
+There are three types of correlation formulas. The most common method is Pearson's correlation, which uses the linear regression of two variables. This method is used with the data is normal.The second type of correlation is Spearman's, which computes the correlation between the rank of the two variables. Finally, there is the Kendall method which measures the correpondence between the ranking of the two variables and is good for small samples. 
+
+
+### Perform a correlation analysis of:
+#### All variables
+```{r}
+cor(survey_df, method = "pearson")
+```
+
+#### A single correlation between two a pair of the variables
+```{r}
+cor(survey_df$TimeReading, survey_df$TimeTV, method = "pearson")
+pairs(survey_df)
+cor(survey_df, use="pairwise.complete.obs")
+
+```
+
+#### Repeat your correlation test in step 2 but set the confidence interval at 99%
+```{r}
+cor.test(survey_df$TimeReading, survey_df$TimeTV, method = "pearson", conf.level = 0.99)
+```
+
+#### Describe what the calculations in the correlation matrix suggest about the relationship between the variables. Be specific with your explanation.
+
+```{r}
+cor(survey_df, method = "pearson")
+```
+
+
+The following have strong negative correlations (meaning when one goes up, the other goes down):
+* TimeReading and TimeTV
+
+The following have moderate negative correlations:
+* TimeReading and Happiness
+
+The following have weak negative correlations: 
+* TimeReading and Gender
+
+The following have weak positive correlations:
+* TimeTV and Gender
+* Happiness and TimeTV
+* Happiness and Gender
+
+The following have moderate positive correlations:
+* TimeTV and Happiness
+
+The following have strong positive correlations (meaning when one goes up, the other goes up):
+* N/A
+
+If I want to focus on meaningful correlations, the best ones to use are the strong correlations followed by the moderate correlations. Due to this fact, I am removing gender as a factor since gender does not have any strong or moderate correlations to the other factors.  
+
+
+### Calculate the correlation coefficient and the coefficient of determination, describe what you conclude about the results.
+```{r}
+survey.lm = lm(TimeReading ~ TimeTV, data=survey_df)
+summary(survey.lm)$r.squared 
+```
+I conclude that the strongest correlation in the data set is between TimeReading and TimeTV. 
+The coefficient of determination tells us how well the linear regression line fits the data. In this case, the line fits well as it has a strong r-squared of .7798
+
+
+### Based on your analysis can you say that watching more TV caused students to read less? Explain.
+There is a strong negative correlation between the time spent watching TV to the time spent reading. This can be translated to students who watch more TV tend to red less. However, it is important to note that correlation does not equal causation. While I can conclude that they are indeed correlated, I would not make the statement that it was "watching more tv caused students to read less" as there are many more unknown factors that could be a "cause".
+
+### Pick three variables and perform a partial correlation, documenting which variable you are “controlling”. Explain how this changes your interpretation and explanation of the results.
+```{r}
+#Grabbing the correlation between TimeReading and TimeTV
+cor(survey_df$TimeReading,survey_df$TimeTV)
+#Partial correlation between TimeReading, TimeTV and Happiness
+pcor.test(survey_df$TimeReading,survey_df$TimeTV,survey_df$Happiness)
+
+```
+
+I am using the controlling variable "Happiness". The p-value is <0.05, which means that we have to reject the null hypothesis that happiness is not a contributing factor to the correlation between TimeReading and TimeTV. 
+
+What this means is that there are other explainations for the relationship between TimeReading and TimeTV. 
+
+## calculate the covariance of the Survey variables and provide an explanation of why you would use this calculation and what the results indicate
+```{r}
+cov(survey_df$TimeReading,survey_df$TimeTV)
+cov(survey_df$TimeReading,survey_df$Happiness)
+cov(survey_df$TimeTV,survey_df$Happiness)
+```
+ Covariance is similar to correlation as it shows a variance between variables. The results show that the negative covariance is stronger with TimeReading and TimeTV as they are with TimeReading and Happiness. The covarance with TimeTV and Happiness is positive.
