@@ -3,13 +3,13 @@
 # Date: 2020-07-09
 
 ## Set the working directory to the root of your DSC 520 directory
-setwd("C:/Users/Rachel/Desktop/College/DSC520/dsc520-master")
+setwd("C:/Users/NelsonR/OneDrive - Weyerhaeuser/Desktop/Current Work")
 
 ## Load the `data/r4ds/heights.csv` to
 heights_df <- read.csv("data/r4ds/heights.csv")
 
 # Fit a linear model
-earn_lm <-  lm(earn ~ age + ed + race + height + age, data=heights_df)
+earn_lm <-  lm(earn ~ age + ed + race + height + sex, data=heights_df)
 
 # View the summary of your model
 summary(earn_lm)
@@ -25,9 +25,9 @@ mean_earn <- mean(heights_df$earn)
 ## Corrected Sum of Squares Total
 sst <- sum((mean_earn - heights_df$earn)^2)
 ## Corrected Sum of Squares for Model
-ssm <- sum((mean_earn - age_predict_df$earn)^2)
+ssm <- sum((mean_earn - predicted_df$earn)^2)
 ## Residuals
-residuals <- heights_df$earn - age_predict_df$earn
+residuals <- heights_df$earn - predicted_df$earn
 ## Sum of Squares for Error
 sse <- sum(residuals^2)
 ## R Squared
