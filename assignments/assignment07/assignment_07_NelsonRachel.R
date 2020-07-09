@@ -15,10 +15,10 @@ earn_lm <-  lm(earn ~ age + ed + race + height + age, data=heights_df)
 summary(earn_lm)
 
 predicted_df <- data.frame(
-  earn = predict(___, ___),
-  ed=___, race=___, height=___,
-  age=___, sex=___
-  )
+  earn = predict(earn_lm, newdata = heights_df),
+  ed=heights_df$ed, race=heights_df$race, height=heights_df$height,
+  age=heights_df$age, sex=heights_df$sex
+)
 
 ## Compute deviation (i.e. residuals)
 mean_earn <- mean(heights_df$earn)
