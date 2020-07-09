@@ -3,7 +3,7 @@
 # Date: 2020-07-09
 
 ## Set the working directory to the root of your DSC 520 directory
-setwd("/homoe/jdoe/Workspaces/dsc520")
+setwd("C:/Users/Rachel/Desktop/College/DSC520/dsc520-master")
 
 ## Load the `data/r4ds/heights.csv` to
 heights_df <- read.csv("data/r4ds/heights.csv")
