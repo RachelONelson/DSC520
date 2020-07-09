@@ -1,6 +1,6 @@
 # Assignment: ASSIGNMENT 7
-# Name: Lastname, Firstname
-# Date: 2010-02-14
+# Name: Nelson, Rachel
+# Date: 2020-07-09
 
 ## Set the working directory to the root of your DSC 520 directory
 setwd("/homoe/jdoe/Workspaces/dsc520")
