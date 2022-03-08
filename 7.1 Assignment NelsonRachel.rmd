@@ -1,0 +1,51 @@
+---
+title: "7.1 Assignment"
+author: "Rachel Nelson"
+date: "7/18/2020"
+output: 
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+```{r setup, include=FALSE}
+library(foreign)
+library(caTools)
+
+```
+
+###a. Fit a binary logistic regression model to the data set that predicts whether or not the patient survived for one year (the Risk1Y variable) after the surgery. Use the glm() function to perform the logistic regression. See Generalized Linear Models for an example. Include a summary using the summary() function in your results.
+```{r}
+# load the data
+CancerData<-read.arff("C:/Users/Rachel/Desktop/College/DSC520/dsc520/data/ThoraricSurgery.arff")
+
+#split data into test and train
+split <- sample.split(CancerData, SplitRatio = 0.8)
+train <- subset(CancerData, split == "TRUE")
+test <- subset(CancerData, split == "FALSE")
+
+# build a model using all factors
+newModel<-glm(train$Risk1Yr ~ DGN+PRE4+PRE5+PRE6+PRE7+PRE8+PRE9+PRE10+PRE11+PRE14+PRE17+PRE19+PRE25+PRE30+PRE32+AGE, data = train, family = binomial()) 
+summary(newModel)
+
+## run test through data
+res <- predict(newModel, test, type = "response")
+res <- predict(newModel, train, type = "response")
+
+```
+
+
+###b. According to the summary, which variables had the greatest effect on the survival rate?
+The variables that have the greatest effect on survival rate are PRE8T, PRE14OC14, PRE30T and PRE17T.
+
+###c. To compute the accuracy of your model, use the dataset to predict the outcome variable. The percent of correct predictions is the accuracy of your model. What is the accuracy of your model?
+```{r}
+#validate the model
+confmatrix <- table(Actual_value=train$Risk1Yr, Predicted_Value = res >0.5)
+confmatrix
+
+#Accuracy
+(confmatrix[[1,1]]+confmatrix[[2,2]])/sum(confmatrix)
+```
+
+The accuracy of the model is 86.87%
+

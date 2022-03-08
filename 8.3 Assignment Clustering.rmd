@@ -1,0 +1,99 @@
+---
+title: "8.3 Assignment Clustering"
+author: "Rachel Nelson"
+date: "7/25/2020"
+output: 
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(factoextra)
+library(cluster)
+library(MAP)
+library(purrr)
+
+# load the data
+cluster_df <- read.csv("C:/Users/Rachel/Desktop/College/DSC520/dsc520/data/clustering-data.csv")
+
+```
+
+####Labeled data is not always available. For these types of datasets, you can use unsupervised algorithms to extract structure. The k-means clustering algorithm and the k nearest neighbor algorithm both use the Euclidean distance between points to group data points. The difference is the k-means clustering algorithm does not use labeled data.
+
+####In this problem, you will use the k-means clustering algorithm to look for patterns in an unlabeled dataset. The dataset for this problem is found at data/clustering-data.csv.
+
+####a. Plot the dataset using a scatter plot.
+```{r}
+
+ggplot(cluster_df, aes(x=x, y=y)) +
+  geom_point() + ggtitle("Clustering Data Scatter Plot")
+
+```
+
+
+####b. Fit the dataset using the k-means algorithm from k=2 to k=12. Create a scatter plot of the resultant clusters for each value of k.
+```{r}
+
+k2 <- kmeans(cluster_df, centers = 2, nstart = 25)
+k3 <- kmeans(cluster_df, centers = 3, nstart = 25)
+k4 <- kmeans(cluster_df, centers = 4, nstart = 25)
+k5 <- kmeans(cluster_df, centers = 5, nstart = 25)
+k6 <- kmeans(cluster_df, centers = 6, nstart = 25)
+k7 <- kmeans(cluster_df, centers = 7, nstart = 25)
+k8 <- kmeans(cluster_df, centers = 8, nstart = 25)
+k9 <- kmeans(cluster_df, centers = 9, nstart = 25)
+k10 <- kmeans(cluster_df, centers = 10, nstart = 25)
+k11 <- kmeans(cluster_df, centers = 11, nstart = 25)
+k12 <- kmeans(cluster_df, centers = 12, nstart = 25)
+
+# plots to compare
+p1 <- fviz_cluster(k2, geom = "point", data = cluster_df) + ggtitle("k = 2")
+p2 <- fviz_cluster(k3, geom = "point",  data = cluster_df) + ggtitle("k = 3")
+p3 <- fviz_cluster(k4, geom = "point",  data = cluster_df) + ggtitle("k = 4")
+p4 <- fviz_cluster(k5, geom = "point",  data = cluster_df) + ggtitle("k = 5")
+p5 <- fviz_cluster(k6, geom = "point",  data = cluster_df) + ggtitle("k = 6")
+p6 <- fviz_cluster(k7, geom = "point",  data = cluster_df) + ggtitle("k = 7")
+p7 <- fviz_cluster(k8, geom = "point",  data = cluster_df) + ggtitle("k = 8")
+p8 <- fviz_cluster(k9, geom = "point",  data = cluster_df) + ggtitle("k = 9")
+p9 <- fviz_cluster(k10, geom = "point",  data = cluster_df) + ggtitle("k = 10")
+p10 <- fviz_cluster(k11, geom = "point",  data = cluster_df) + ggtitle("k = 11")
+p11 <- fviz_cluster(k12, geom = "point",  data = cluster_df) + ggtitle("k = 12")
+
+
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, nrow = 4)
+
+```
+
+
+####c. As k-means is an unsupervised algorithm, you cannot compute the accuracy as there are no correct values to compare the output to. Instead, you will use the average distance from the center of each cluster as a measure of how well the model fits the data. To calculate this metric, simply compute the distance of each data point to the center of the cluster it is assigned to and take the average value of all of those distances.
+
+####Calculate this average distance from the center of each cluster for each value of k and plot it as a line chart where k is the x-axis and the average distance is the y-axis.
+
+####One way of determining the “right” number of clusters is to look at the graph of k versus average distance and finding the “elbow point”. Looking at the graph you generated in the previous example, what is the elbow point for this dataset?
+
+```{r}
+
+set.seed(123)
+
+# function to compute total within-cluster sum of square 
+wss <- function(k) {
+  kmeans(cluster_df, k, nstart = 10 )$tot.withinss
+}
+
+# Compute and plot wss for k = 2 to k = 12
+k.values <- 2:12
+
+# extract wss for 2-15 clusters
+wss_values <- map_dbl(k.values, wss)
+
+plot(k.values, wss_values,
+       type="b", pch = 19, frame = FALSE, 
+       xlab="Number of clusters K",
+       ylab="Total within-clusters sum of squares")
+
+```
+
+The elbow is 5.

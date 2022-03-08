@@ -1,0 +1,314 @@
+---
+title: 'Building a Successful  KickStarter Campaign'
+author: "Rachel Nelson"
+date: "8/1/2020"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+
+#Section 1 
+###Introduction: 
+How can I make my KickStarter campaign a success? 
+
+###Research questions
+* Are there certain types/category of campaigns that are more successful?
+* How much money should you ask for?
+* Is there a time period for the campaign that works better than others?
+* What is the average contribution of a backer?
+* Is there a better time of year to launch a campaign?
+
+###Approach
+* I will be performing basic data analysis and correlation on the data set provided. I will  review things like the mean, median and mode of some of the factors that are of interest. 
+
+####How your approach addresses (fully or partially) the problem.
+By finding out which metrics matter, we can use these elements to ensure your next kickstarter campaign ends in success.
+
+####Data 
+https://www.kaggle.com/kemical/kickstarter-projects
+
+####Required Packages
+* dplyr 
+* ggplot2
+* plotly
+* lm.beta
+
+
+####Plots and Table Needs
+* Scatter plots
+* data tables
+* correlation tables
+* box plots
+
+####Questions for future steps
+* Should I look into neural networks? 
+
+# Section 2
+### How to import and clean my data
+I am importing the data by connecting the the CSV that was available for download on the Kaggle site. 
+https://www.kaggle.com/kemical/kickstarter-projects
+
+```{r}
+
+# load the data
+ks_df <- read.csv("D:/College/DSC520/dsc520/data/ks-projects-201801.csv")
+
+```
+
+I am cleaning the data set to prepare it for analysis. 
+####Check for missing columns
+```{r}
+
+# Check for Missing Columns
+names(ks_df)
+ks_df$rowid <- paste(ks_df$ID, "-", ks_df$round)
+length(unique(ks_df$rowid))
+length(ks_df$rowid)
+
+```
+Here I confirmed that all rows have a unique ID. I also reviewed the data to ensure all the data I needed was contained within the data set. 
+
+####Check variables names
+```{r}
+# checks variable names and replace with new name
+library(dplyr)
+ks_df <- rename(ks_df, usd_pledged = usd.pledged)
+
+```
+
+Here I renamed the variable usd.pledged to usd_pledged to align the naming conventions of all of my headers, since the rest of the headers uses underscores instead of periods for spaces. 
+
+####Check missing observations
+```{r}
+# checks for missing values in observations
+colMeans(is.na(ks_df))
+# removes column from data set
+ks_df = subset(ks_df, select = -c(usd_pledged) )
+
+```
+Here I am looking for missing values. There is a small amount of data in the usd_pledged with missing values. If I wanted to cleanse the data set, I could remove these values, but for now, I want to keep it in mind since there are zero missing values from usd_pledged_real, which is a column giving the same information, but the conversion to USD was done from the fixer.io api instead of done by kickstarter. Instead of removing the rows with the missing data, I am going to remove the column from the data set since it is a duplicate column. 
+
+usd_pledged: conversion in US dollars of the pledged column (conversion done by kickstarter).
+usd pledge real: conversion in US dollars of the pledged column (conversion from Fixer.io API).
+
+
+####Check variable classification
+```{r}
+# checks attributes of data frame
+str(ks_df)
+
+```
+Checking the variable classification is the step used to make sure the data is the right datatype for analysis. 
+
+
+####Check duplicate rows
+```{r}
+
+# Checking if one row is identical to another
+distinctdata <- distinct(ks_df)
+nrow(ks_df)
+nrow(distinctdata)
+
+```
+Checking for duplicate rows within the data. None were found. If duplicate rows are found, the duplicate should be extracted from the dataset. 
+
+####Change dates from factors to date
+```{r}
+ks_df <- transform(ks_df, deadline = as.Date(deadline), launched = as.Date(launched), backers = as.numeric(backers))
+```
+Changes the data type of deadline and launched to date.
+
+### What does the final data set look like? 
+```{r}
+head(ks_df)
+```
+
+
+
+
+
+### Questions for future steps
+I need to figure out if and how the factor/category data needs to be changed to numerical data. I also had to change dates from factors to date data types.
+
+### What information is not self-evident?
+I plan to run both correlation and unsupervised learning models on the data to see if I can uncover any new information that is not self-evident.
+
+
+### What are different ways you could look at this data?
+Yes, the questions I want to answer can be viewed though looking at bar charts, frequency plots and statistical models. 
+* Are there certain types/category of campaigns that are more successful?
+* How much money should you ask for?
+* Is there a time period for the campaign that works better than others?
+* What is the average contribution of a backer?
+* Is there a better time of year to launch a campaign?
+
+### How do you plan to slice and dice the data?.
+Created a new variable for % successful by taking the pledged and dividing it by the goal. I also slided out the month for both deadline and launch dates. 
+```{r}
+# Adding new rows to slide and dice the data later
+ks_df <-
+  ks_df %>%
+  mutate(
+    pledged_to_goal = usd_pledged_real/usd_goal_real,
+    count = 1,
+    deadline_month = format(deadline,"%m"),
+    launched_month = format(launched,"%m"),
+    backers_per_pledge = usd_pledged_real/backers
+    )
+
+```
+
+
+### How could you summarize your data to answer key questions?
+This ties into the different ways I can look at the data set. Charts and visualizations are a great way to summarize the data and answer key questions. 
+
+### What types of plots and tables will help you to illustrate the findings to your questions? 
+Bar charts, box plots and scatter charts will help illustrate findings to my questions. 
+
+### Do you plan on incorporating any machine learning techniques to answer your research questions? Explain.
+Yes, I plan to see if there are any supervised (like decision tree or random forest) models and unsupervised (clustering) that can help make sense of what is funded verses unfunded. 
+
+### Questions for future steps
+This still ties in to question #3, where I need to figure out if the factor/categyory data needs to be changed to numerical data and if so, how I go about doing that. 
+
+# Section 3
+### Introduction
+Kickstarter campaigns is a way to crowdsource funding to support projects, people or situations. It's a way to raise money. In this analysis, I will be finding out if there are controllable factors which can lead to a successful campaign. 
+
+### The problem statement you addressed
+Is there a way to design a kickstarter campaign to increase it's likelihood to be successful?
+
+### How you addressed this problem statement 
+I addressed this problem statement by looking into answering 5 questions: 
+* Are there certain types/category of campaigns that are more successful?
+* How much money should you ask for?
+* Is there a time period for the campaign that works better than others?
+* What is the average contribution of a backer?
+* Is there a better time of year to launch a campaign?
+
+I also performed correlation and applied machine learning techniques to see if there are ways to increase the likelihood of building successful campaigns. 
+
+### Analysis
+
+#### Are there certain types/category of campaigns that are more successful?
+```{r}
+
+# Filtering by one criterion
+ks_dff <- filter(ks_df, state == "successful")
+
+## Successful Launches based on Deadline Month
+counts <- table(ks_dff$main_category)
+barplot(counts, main="# of Successful Launches",
+   xlab="Main Category")
+
+
+```
+The top 5 categories with successful campaigns are:
+1. Music
+2. Film & Video
+3. Games
+4. Publishing
+5. Art
+
+
+
+#### How much money should you ask for?
+```{r}
+library(ggplot2)
+## Create a scatterplot of all states
+ggplot(ks_df, aes(x=state, y=goal, col=state)) + ggtitle("State vs Goal Amount") + xlab("State") + ylab("Goal Amount") + geom_point(aes(colour = state))
+
+# Boxplot of only successful campaigns
+boxplot(goal~count,data=ks_dff, main="Successful Campaigns",
+   xlab="Goal", ylab="Campaign")
+
+summary(ks_dff)
+
+
+```
+Successful campaigns have a smaller range then non-successful campaigns. 
+The average successful campaign has a goal of around 10,000 with a median of around 4,000.
+
+#### Is there a time period for the campaign that works better than others?
+```{r}
+## Successful Launches based on Deadline Month
+counts <- table(ks_dff$deadline_month)
+barplot(counts, main="# of Successful Launches",
+   xlab="Deadline Month")
+
+```
+May has the highest number of campaigns that are successful.
+
+
+#### What is the average contribution of a backer?
+```{r}
+
+# Boxplot of only successful campaigns
+boxplot(usd_pledged_real~count,data=ks_dff, main="Pledged Per Backer",
+   xlab="Goal", ylab="Campaign")
+
+summary(ks_dff)
+
+```
+The median backer pledges 63 USD to projects. 
+
+
+#### Is there a better time of year to launch a campaign?
+```{r}
+## Successful Launches
+counts <- table(ks_dff$launched_month)
+barplot(counts, main="# of Successful Launches",
+   xlab="Months")
+```
+March and October has the most for count of successful launches. December has the least. 
+
+#### What are the factors that contribute to sucessful campaigns?
+```{r}
+# Prepping the data for modelling:
+
+# Adding new rows to indicate successful campaigns
+ks_dff <-
+  ks_dff %>%
+  mutate(
+    successful = 1
+    )
+
+# Filtering by one criterion where campaigns not successful
+ks_dfn <- filter(ks_df, state != "successful")
+
+
+# Adding new rows to indicate unsuccessful campaigns
+ks_dfn <-
+  ks_dfn %>%
+  mutate(
+    successful = 0
+    )
+
+#combines successful and unsuccessful campaigns
+df_union1<-merge(ks_dff,ks_dfn,all=TRUE)
+
+df_union1 <- transform(df_union1, deadline_month = as.integer(deadline_month), launched_month = as.integer(launched_month))
+
+model_1 <- lm(successful ~ backers+usd_pledged_real,usd_goal_real,pledged_to_goal+deadline_month+launched_month, data = df_union1)
+summary(model_1)
+
+library(lm.beta)
+model_1.beta <- lm.beta(model_1)
+coef(model_1.beta)
+
+# linear regression on backers
+linearMod <- lm(successful ~ backers, data=df_union1)
+print(linearMod)
+summary(linearMod)
+
+
+
+
+```
+The number of backers is a significant factor when predicting if the kickstarter will be a success.
+
+
+### Conclusion
+The best way to have a successful campaign is to increase the number of backers for that campaign. Would not recommend campaigning during the holiday season. 
+

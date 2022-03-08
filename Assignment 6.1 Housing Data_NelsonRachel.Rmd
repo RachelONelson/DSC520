@@ -1,0 +1,173 @@
+---
+title: "Assignment 6.1 housing data"
+author: "Rachel Nelson"
+date: "7/11/2020"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+library(readxl)
+
+```
+
+Data for this assignment is focused on real estate transactions recorded from 1964 to 2016 and will use statistical correlation, multiple regression and R programming with focus on following variables: Sale Price and several other possible predictors.
+
+### Explain why you chose to remove data points from your ‘clean’ dataset.
+```{r}
+setwd("C:/Users/Rachel/Desktop/College/DSC520/dsc520-master")
+housing_df <- read_excel("data/week-6-housing.xlsx")
+```
+
+### Create two variables; one that will contain the variables Sale Price and Square Foot of Lot (same variables used from previous assignment on simple regression) and one that will contain Sale Price and several additional predictors of your choice. Explain the basis for your additional predictor selections.
+
+```{r}
+model_1 <- lm(housing_df$`Sale Price` ~ sq_ft_lot ,data = housing_df)
+model_2 <- lm(housing_df$`Sale Price` ~ sq_ft_lot + zip5 + bedrooms + square_feet_total_living + bath_full_count + bath_half_count + housing_df$bath_3qtr_count + year_built + building_grade + sale_reason+ sale_instrument + housing_df$year_renovated, data = housing_df)
+
+```
+
+The additional predictors are baesd on which variables are avaialble as numerical values excluding lon and lat since I have zip code as a factor and it woukld be duplicative.
+
+### Execute a summary() function on two variables defined in the previous step to compare the model results. What are the R2 and Adjusted R2 statistics? Explain what these results tell you about the overall model. Did the inclusion of the additional predictors help explain any large variations found in Sale Price?
+
+```{r}
+summary(model_1)
+summary(model_2)
+```
+
+
+The R Squared for model_1 is 0.014 whle the R squared for model_2 is 0.2315. The R squared will tell you how well the model fits your data. In the first model, it only fits a little more then 1% of my data, while in the second model, it fits 20%.
+
+The R Squared adjusted is the same meaning, but adjusted for the number of predictors in the model. The first model has one predictor, while the second model has 8 predictors. In this case, the first model has an R squared adjusted of 0.1428 while the second model has an adjusted r-squared of 0.2308. In both cases, model_2 is a better model to fit the data then model_1.
+
+### Considering the parameters of the multiple regression model you have created. What are the standardized betas for each parameter and what do the values indicate?
+
+```{r}
+library(lm.beta)
+model_2.beta <- lm.beta(model_2)
+coef(model_2.beta)
+
+```
+
+The standardized betaS for each parameter are listed above.  Standardized betas compare strength of each predictor to the Sale Price with the higher the absolute value of the beta coefficient, the stronger the effect. 
+
+The strongest standardized beta in this data set is the square_feet_total_living followed by the year built.
+
+### Calculate the confidence intervals for the parameters in your model and explain what the results indicate.
+
+```{r}
+confint(model_2)
+```
+
+The results indicate that 95% of these confidence intervals would contain the true value b. 
+A good model would have a small confidence interval. However, note that in this model, we have a confidence interval that cross zero, which indicates that in some samples, the predictor has a negative relationship to the outcome whereas in others, it has a positive relationship. 
+
+This tells us that the best predictors which have a small confidence interval include square_feet_total_living, year built, year built and bath_3qtr_count. These predictors have smaller confidence intervals, which indicates the estimates for the current model are likely to be representative of the true population values. 
+
+The predictors that cross zero, such as zip5, bedrooms, bath_full_count, bath_half_count, sale_instrament all cross zero, so are not the best predictors since sometimes the predictor has a negative relationship, and other samples it has a positive relationship. 
+ 
+
+### Assess the improvement of the new model compared to your original model (simple regression model) by testing whether this change is significant by performing an analysis of variance.
+
+```{r}
+model_3 <- lm(housing_df$`Sale Price` ~ sq_ft_lot + square_feet_total_living + year_built + building_grade, data = housing_df)
+anova(model_1, model_3)
+
+```
+
+The value of F is 1153 and Pr(>F) is 2.2e-16; we can say that model 2 significantly improved the fit of the model to the data compared to model 1.
+
+
+
+### Perform casewise diagnostics to identify outliers and/or influential cases, storing each function's output in a dataframe assigned to a unique variable name.
+
+```{r}
+housing_df$residuals<-resid(model_3)
+housing_df$standardized.residuals<- rstandard(model_3) 
+housing_df$studentized.residuals<-rstudent(model_3) 
+housing_df$cooks.distance<-cooks.distance(model_3) 
+housing_df$dfbeta<-dfbeta(model_3) 
+housing_df$dffit<-dffits(model_3) 
+housing_df$leverage<-hatvalues(model_3) 
+housing_df$covariance.ratios<-covratio(model_3)
+```
+
+
+### Calculate the standardized residuals using the appropriate command, specifying those that are +-2, storing the results of large residuals in a variable you create.
+
+```{r}
+
+housing_df$large.residual <- housing_df$standardized.residuals > 2 | housing_df$standardized.residuals < -2 
+
+```
+
+
+### Use the appropriate function to show the sum of large residuals.
+
+```{r}
+sum(housing_df$large.residual)
+
+```
+
+### Which specific variables have large residuals (only cases that evaluate as TRUE)?
+
+```{r}
+housing_df[housing_df$large.residual,c("Sale Price", "sq_ft_lot", "square_feet_total_living", "year_built", "building_grade", "standardized.residuals")]
+
+
+```
+
+
+### Investigate further by calculating the leverage, cooks distance, and covariance rations. Comment on all cases that are problematics.
+
+```{r}
+housing_df[housing_df$large.residual , c("cooks.distance", "leverage", "covariance.ratios")]
+
+```
+
+For cooks, you are looking for a cook's distance of > 1.
+For leveragwe, you are looking for values either twice or three times as large as the average
+For covariance ratios, we are looking for any cases that deviate substantially the covariance boundaries
+
+
+
+### Perform the necessary calculations to assess the assumption of independence and state if the condition is met or not.
+
+```{r}
+library(lmtest)
+dwtest(model_3)
+```
+The closer to 2 that the value is, the better. In this case, the value is 0.54148, which is not close to 2 and may be a cause of concern.  The p-value of < 2.2e-16 means it is significant and confirms this conclusion. The condition is not met.
+
+
+### Perform the necessary calculations to assess the assumption of no multicollinearity and state if the condition is met or not.
+
+```{r}
+library(car)
+mean(vif(model_3))
+vif(model_3)
+1/vif(model_3)
+mean(vif(model_3))
+
+```
+The state of the condition is met. Based on these measures we can safely conclude that there is no collinearity within our data.
+
+
+### Visually check the assumptions related to the residuals using the plot() and hist() functions. Summarize what each graph is informing you of and if any anomalies are present.
+
+```{r}
+hist(housing_df$studentized.residuals)
+hist(rstudent(model_3))
+plot(housing_df$studentized.residuals)
+plot(rstudent(model_3))
+
+```
+ data looks normal. It does not look like the data have violated the assumption of linearity .
+
+### Overall, is this regression model unbiased? If an unbiased regression model, what does this tell us about the sample vs. the entire population model?
+
+
+The model does not appear to be biased. The sample is a good represention of the entire population. 

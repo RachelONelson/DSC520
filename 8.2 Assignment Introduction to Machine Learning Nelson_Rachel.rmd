@@ -1,0 +1,172 @@
+---
+title: '8.2 Assignment: Introduction to Machine Learning'
+author: "Rachel Nelson"
+date: "7/25/2020"
+output: 
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+
+# load the libraries being used
+library(ggplot2)
+library(foreign)
+library(caTools)
+library(class)
+
+# load the data
+bcd_df <- read.csv("C:/Users/Rachel/Desktop/College/DSC520/dsc520/data/binary-classifier-data.csv")
+tcd_df <- read.csv("C:/Users/Rachel/Desktop/College/DSC520/dsc520/data/trinary-classifier-data.csv")
+ 
+
+```
+
+
+####a. Plot the data from each dataset using a scatter plot.
+```{r}
+
+ggplot(bcd_df, aes(x=x, y=y, color=label)) +
+  geom_point() + ggtitle("Binary Classifier Data")
+
+ggplot(tcd_df, aes(x=x, y=y, color=label)) +
+  geom_point() + ggtitle("Trinary Classifier Data")
+
+```
+
+
+####b. The k nearest neighbors algorithm categorizes an input value by looking at the labels for the k nearest points and assigning a category based on the most common label. In this problem, you will determine which points are nearest by calculating the Euclidean distance between two points. As a refresher, the Euclidean distance between two points:
+
+####Fitting a model is when you use the input data to create a predictive model. There are various metrics you can use to determine how well your model fits the data. You will learn more about these metrics in later lessons. For this problem, you will focus on a single metric; accuracy. Accuracy is simply the percentage of how often the model predicts the correct result. If the model always predicts the correct result, it is 100% accurate. If the model always predicts the incorrect result, it is 0% accurate.
+
+####Fit a k nearest neighbors model for each dataset for k=3, k=5, k=10, k=15, k=20, and k=25. Compute the accuracy of the resulting models for each value of k. Plot the results in a graph where the x-axis is the different values of k and the y-axis is the accuracy of the model.
+
+```{r}
+
+# First Value
+head(bcd_df)
+str(bcd_df)
+
+# creating test and training data sets 
+bcd.subset <- as.data.frame(bcd_df)
+head(bcd.subset)
+
+nomalize <- function(x) {
+  return ((x - min(x))/(max(x)-min(x)))}
+
+set.seed(123)
+dat.d <- sample(1:nrow(bcd_df), size=nrow(bcd_df)*0.7, replace = FALSE)
+
+train.bcd <- bcd_df[dat.d,]
+test.bcd <- bcd_df[-dat.d,]
+
+train.bcd_labels <- bcd_df[dat.d,1]
+test.bcd_labels <- bcd_df[-dat.d,1]
+
+## KNN model and accuracy
+
+knn.3 <- knn(train=train.bcd, test=test.bcd, cl=train.bcd_labels, k=3)
+bcd.ACC.3 <-100 * sum(test.bcd_labels == knn.3)/NROW(test.bcd_labels)
+bcd.ACC.3
+
+knn.5 <- knn(train=train.bcd, test=test.bcd, cl=train.bcd_labels, k=5)
+bcd.ACC.5 <-100 * sum(test.bcd_labels == knn.5)/NROW(test.bcd_labels)
+bcd.ACC.5
+
+knn.10 <- knn(train=train.bcd, test=test.bcd, cl=train.bcd_labels, k=10)
+bcd.ACC.10 <-100 * sum(test.bcd_labels == knn.10)/NROW(test.bcd_labels)
+bcd.ACC.10
+
+knn.15 <- knn(train=train.bcd, test=test.bcd, cl=train.bcd_labels, k=15)
+bcd.ACC.15 <-100 * sum(test.bcd_labels == knn.15)/NROW(test.bcd_labels)
+bcd.ACC.15
+
+knn.20 <- knn(train=train.bcd, test=test.bcd, cl=train.bcd_labels, k=20)
+bcd.ACC.20 <-100 * sum(test.bcd_labels == knn.20)/NROW(test.bcd_labels)
+bcd.ACC.20
+
+knn.25 <- knn(train=train.bcd, test=test.bcd, cl=train.bcd_labels, k=25)
+bcd.ACC.25 <-100 * sum(test.bcd_labels == knn.25)/NROW(test.bcd_labels)
+bcd.ACC.25
+
+
+```
+
+```{r}
+
+
+# First Value
+head(tcd_df)
+str(tcd_df)
+
+# creating test and training data sets 
+tcd.subset <- as.data.frame(tcd_df)
+head(tcd.subset)
+
+nomalize <- function(x) {
+  return ((x - min(x))/(max(x)-min(x)))}
+
+set.seed(123)
+dat.d <- sample(1:nrow(tcd_df), size=nrow(tcd_df)*0.7, replace = FALSE)
+
+train.tcd <- tcd_df[dat.d,]
+test.tcd <- tcd_df[-dat.d,]
+
+train.tcd_labels <- tcd_df[dat.d,1]
+test.tcd_labels <- tcd_df[-dat.d,1]
+
+## KNN model and accuracy
+
+knn.3 <- knn(train=train.tcd, test=test.tcd, cl=train.tcd_labels, k=3)
+tcd.ACC.3 <-100 * sum(test.tcd_labels == knn.3)/NROW(test.tcd_labels)
+tcd.ACC.3
+
+knn.5 <- knn(train=train.tcd, test=test.tcd, cl=train.tcd_labels, k=5)
+tcd.ACC.5 <-100 * sum(test.tcd_labels == knn.5)/NROW(test.tcd_labels)
+tcd.ACC.5
+
+knn.10 <- knn(train=train.tcd, test=test.tcd, cl=train.tcd_labels, k=10)
+tcd.ACC.10 <-100 * sum(test.tcd_labels == knn.10)/NROW(test.tcd_labels)
+tcd.ACC.10
+
+knn.15 <- knn(train=train.tcd, test=test.tcd, cl=train.tcd_labels, k=15)
+tcd.ACC.15 <-100 * sum(test.tcd_labels == knn.15)/NROW(test.tcd_labels)
+tcd.ACC.15
+
+knn.20 <- knn(train=train.tcd, test=test.tcd, cl=train.tcd_labels, k=20)
+tcd.ACC.20 <-100 * sum(test.tcd_labels == knn.20)/NROW(test.tcd_labels)
+tcd.ACC.20
+
+knn.25 <- knn(train=train.tcd, test=test.tcd, cl=train.tcd_labels, k=25)
+tcd.ACC.25 <-100 * sum(test.tcd_labels == knn.25)/NROW(test.tcd_labels)
+tcd.ACC.25
+
+```
+```{r}
+#Plot the results in a graph where the x-axis is the different values of k and the y-axis is the accuracy of the model
+k_value <- c(3,5,10,15,25)
+bcd.ACC_value <- c(bcd.ACC.3,bcd.ACC.5,bcd.ACC.10,bcd.ACC.15,bcd.ACC.25)
+tcd.ACC_value <- c(tcd.ACC.3,tcd.ACC.5,tcd.ACC.10,tcd.ACC.15,tcd.ACC.25)
+
+
+model_accuracy <- matrix(c(3,bcd.ACC.3,tcd.ACC.3,5,bcd.ACC.5,tcd.ACC.5,10,bcd.ACC.10,tcd.ACC.10,15,bcd.ACC.15,tcd.ACC.15,20,bcd.ACC.20,tcd.ACC.20,25,bcd.ACC.25,tcd.ACC.25),ncol=3,byrow=TRUE)
+colnames(model_accuracy) <- c("k","bcd","tcd")
+rownames(model_accuracy) <- c("3","5","10","15","20","25")
+model_accuracy <- as.data.frame(model_accuracy)
+model_accuracy
+
+ggplot(model_accuracy, aes(x=k, y=bcd)) +
+  geom_point() + ggtitle("Binary Classifier Data K Accuracy")
+
+ggplot(model_accuracy, aes(x=k, y=tcd)) +
+  geom_point() + ggtitle("Trinary Classifier Data K Accuracy")
+
+```
+
+
+####c. In later lessons, you will learn about linear classifiers. These algorithms work by defining a decision boundary that separates the different categories.
+####Looking back at the plots of the data, do you think a linear classifier would work well on these datasets?
+Maybe? It's hard to say for sure because the clusters have more then one k. However, since the data set allows for supervised learning, you could compare the accuracy of the linear classifier to the accuracy of KNN and check to see which model provides the better outcome. 
+
+

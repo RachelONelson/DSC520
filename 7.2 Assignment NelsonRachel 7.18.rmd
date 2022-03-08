@@ -1,0 +1,91 @@
+---
+title: "7.1 Assignment"
+author: "Rachel Nelson"
+date: "7/18/2020"
+output: 
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+```{r setup, include=FALSE}
+library(foreign)
+library(caTools)
+library(class)
+
+
+```
+
+###a. What is the accuracy of the logistic regression classifier?
+
+
+```{r}
+# load the data
+bcd_df <- read.csv("C:/Users/Rachel/Desktop/College/DSC520/dsc520/data/binary-classifier-data.csv")
+
+#split data into test and train
+split <- sample.split(bcd_df, SplitRatio = 0.8)
+train.bcd <- subset(bcd_df, split == "TRUE")
+test.bcd <- subset(bcd_df, split == "FALSE")
+
+
+# build a model using all factors
+newModel<-glm(label ~ x + y, data = train.bcd, family = binomial()) 
+summary(newModel)
+
+## run test through data
+res <- predict(newModel, test.bcd, type = "response")
+res <- predict(newModel, train.bcd, type = "response")
+
+#validate the model
+confmatrix <- table(Actual_value=train.bcd$label, Predicted_Value = res >0.5)
+confmatrix
+
+#Accuracy
+(confmatrix[[1,1]]+confmatrix[[2,2]])/sum(confmatrix)
+
+```
+The accuracy of the logistic regression is 58%.
+
+###b. How does the accuracy of the logistic regression classifier compare to the nearest neighbors algorithm?
+```{r}
+# load the data
+bcd_df <- read.csv("C:/Users/Rachel/Desktop/College/DSC520/dsc520/data/binary-classifier-data.csv")
+head(bcd_df)
+str(bcd_df)
+
+# creating test and training data sets 
+bcd.subset <- as.data.frame(bcd_df)
+head(bcd.subset)
+
+nomalize <- function(x) {
+  return ((x - min(x))/(max(x)-min(x)))}
+
+bcd.subset.n <- as.data.frame(lapply(bcd.subset[,2:3], normalize)
+head(bcd.subset.n)
+
+set.seed(123)
+dat.d <- sample(1:nrow(bcd.subset.n), size=nrow(bcd.subset.n)*0.7, replace = FALSE)
+
+
+train.bcd <- bcd.subset[dat.d,]
+test.bcd <- bcd.subset[-dat.d,]
+
+train.bcd_labels <- bcd.subset[dat.d,1]
+test.bcd_labels <- bcd.subset[-dat.d,1]
+
+```
+
+
+```{r}
+NROW(train.bcd_labels)
+## KNN model and accuracy
+
+knn.38 <- knn(train=train.bcd, test=test.bcd, cl=train.bcd_labels, k=38)
+ACC.38 <-100 * sum(test.bcd_labels == knn.38)/NROW(test.bcd_labels)
+ACC.38
+```
+The accuracy of the KNN model is 97.3%
+
+###c. Why is the accuracy of the logistic regression classifier different from that of the nearest neighbors
+They are using different models/ways to predict the outcome. Good data scientists will always try different models with their data to find the one with the best fit. The KNN algorithm will predict the outcome based on the distance and average of plots near them. 
+

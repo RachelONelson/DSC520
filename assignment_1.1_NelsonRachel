@@ -1,0 +1,50 @@
+# Assignment: 1.1 Assignment: Test Scores
+# Name: Nelson, Rachel
+# Date: 2010-06-06
+
+
+1. What are the observational units in this study? 
+  The obervational units is this study is Count, Score and section
+
+2. Identify the variables mentioned in the narrative paragraph and determine which are categorical and quantitative?
+  Section is categorical while Count and Score are quantitative
+
+3. Create one variable to hold a subset of your data set that contains only the Regular Section and one variable for the Sports Section.
+
+4. Use the Plot function to plot each Sections scores and the number of students achieving that score. Use additional Plot Arguments to label the graph and give each axis an appropriate label. Once you have produced your Plots answer the following questions:
+  a. Comparing and contrasting the point distributions between the two section, looking at both tendency and consistency: Can you say that one section tended to score more points than the other? Justify and explain your answer.
+The Regular section had a more narrow distribution of scoring then the sports section did. The regular section also had a higher average score compared to Sports. The regular section also had a higher frequency > 10 count. Because of these
+factors I conclude that the regular course tended to score more points, more consistently.
+
+b. Did every student in one section score more points than every student in the other section? If not, explain what a statistical tendency means in this context.
+No, every student in one section did not score more points then ever sutdent in the other section.
+In this context, statistical consistency looks at the mean, median and mode of the scores and compares the two. If every student in one section scored more points then every student in the other section, the mean would be very different between the two sections, and the minimum score in one section would be > the max score of another section. 
+
+c. What could be one additional variable that was not mentioned in the narrative that could be influencing the point distributions between the two sections?
+  Class type. If the class is online or in-person (if different)
+
+## R
+## Load the scores file using 'read.csv()'
+## Examine the structure of `scores_df` using `str()` and looks at a summary of the data using 'summary()'
+scores_df <- read.csv("data/scores.csv")
+str(scores_df)
+summary(scores_df)
+
+# Creates variables to hold a subset of your data set that contains only the Regular Section and one variable for the Sports Section
+Regular_df <- scores_df[ which(Section=='Regular'),]
+Sports_df <- scores_df[ which(Section=='Sports'),]
+
+#Uses the Plot function to plot each Sections scores and the number of students achieving that score and names and x and y axis as well as gives a title to the plot
+plot(Sports_df$Count, Sports_df$Score, main = 'Sports Section', xlab="Count", ylab="Score")
+plot(Regular_df$Count, Regular_df$Score, main = 'Regular Section',xlab="Count", ylab="Score")
+plot(scores_df$Section, scores_df$Score,main = 'Scores by Section',xlab="Section", ylab="Score") #boxplot comparison
+
+#Other data reviewed
+summary(Regular_df)
+summary(Sports_df)
+
+sum(Regular_df$Count)
+sum(Regular_df$Score)
+
+sum(Sports_df$Count)
+sum(Sports_df$Score)
